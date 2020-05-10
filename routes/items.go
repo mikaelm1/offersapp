@@ -34,3 +34,17 @@ func ItemsCreate(c *gin.Context) {
 
 	c.JSON(http.StatusOK, item)
 }
+
+func ItemsForSaleByCurrentUser(c *gin.Context) {
+	userID := c.GetString("user_id")
+	db, _ := c.Get("db")
+	conn := db.(pgx.Conn)
+
+	items, err := models.GetItemsBeingSoldByUser(userID, &conn)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"items": items})
+}
